@@ -9,10 +9,16 @@
         cursor: pointer;
         display: block;
       }
+
+      .line {
+        stroke-width: 0.5;
+        stroke: rgb(6,120,155);
+        fill: none;
+      }
     </style>
   </head>
   <body>
-    <div id="rectDemo"></div>
+    <!-- <div id="rectDemo"></div>
     <script type="text/javascript">
       var rectDemo = d3.select("#rectDemo")
             .append("svg:svg")
@@ -23,7 +29,7 @@
             .attr("y", 100)
             .attr("height", 100)
             .attr("width", 200);
-    </script>
+    </script> -->
     <div id="barDemo"></div>
 
     <script type="text/javascript">
@@ -98,6 +104,53 @@
         textNode._groups[0][0].textContent = Math.abs(y - 200);
         textNode.attr("dy", function(datum, index) { return y + 20 })
       }
+    </script>
+    <div id="lineDemo"></div>
+    <script text='text/javascript'>
+      var width = 800,
+          height = 300,
+          radius = 4,
+          padding = radius * 6,
+          numPoints = 11;
+
+      var svg = d3.select('#lineDemo')
+        .append('svg:svg')
+        .attr('width', width)
+        .attr('height', height);
+
+      var spread = d3.range(0, width, Math.floor(width / numPoints));
+
+      var line = d3.line()
+        .x(function(d) { return d.x; })
+        .y(function(d) { return d.y; })
+
+      var points = d3.range(numPoints).map(function(d) {
+        return {
+          x: spread[d] + 5,
+          y: Math.abs(Math.random() * height - 10)
+        }
+      });
+
+      var circles = svg
+        .append('g')
+        .selectAll('circle')
+        .data(points)
+        .enter()
+          .append('circle')
+          .attr('r', radius)
+          .attr('cx', function(d) { return d.x })
+          .attr('cy', function(d) { return d.y });
+
+      function drawPath() {
+        var path = svg.selectAll('path').data([points]);
+        path.enter()
+          .append('path')
+          .attr('d', line)
+          .attr('class', 'line')
+          .exit().remove()
+      }
+
+      drawPath()
     </script>
   </body>
 </html>
