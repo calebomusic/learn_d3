@@ -127,7 +127,7 @@
       var points = d3.range(numPoints).map(function(d) {
         return {
           x: spread[d] + 5,
-          y: Math.abs(Math.random() * height - 10)
+          y: Math.max(padding, Math.min(Math.abs(Math.random() * height), height - padding))
         }
       });
 
@@ -139,18 +139,47 @@
           .append('circle')
           .attr('r', radius)
           .attr('cx', function(d) { return d.x })
-          .attr('cy', function(d) { return d.y });
+          .attr('cy', function(d) { return d.y })
+          .style('display', 'none');
 
-      function drawPath() {
-        var path = svg.selectAll('path').data([points]);
-        path.enter()
+      function drawPath(arg) {
+        // var path = svg.selectAll('path').data([arg]);
+        svg
           .append('path')
+          .data([arg])
           .attr('d', line)
           .attr('class', 'line')
           .exit().remove()
       }
 
-      drawPath()
+      // drawPath(points)
+
+      var drag = d3.drag().on("drag", dragHandler);
+      svg.call(drag);
+
+      function dragHandler() {
+        var coord = d3.mouse(this),
+            x = coord[0],
+            y = Math.max(padding, Math.min(coord[1], height - padding)),
+            i = Math.floor(x / (width / numPoints));
+
+          if(i >= circles._groups[0].length || i < 0) return;
+          if(y < 0 || y > 300) return;
+          var circle = d3.select(circles._groups[0][i]);
+          circle.attr('cy', y);
+          points[i].y = y;
+          drawPath(points);
+      }
+
+      window.setInterval(function() {
+        var i = Math.floor(Math.random() * numPoints),
+            circle = d3.select(circles._groups[0][i]),
+            y = Math.floor(Math.random() * 30) + points[i].y
+
+          circle.attr('cy', y);
+          points[i].y = y;
+          drawPath(points);
+      }, 100)
     </script>
   </body>
 </html>
