@@ -142,17 +142,27 @@
           .attr('cy', function(d) { return d.y })
           .style('display', 'none');
 
-      function drawPath(arg) {
-        // var path = svg.selectAll('path').data([arg]);
-        svg
-          .append('path')
-          .data([arg])
-          .attr('d', line)
+      function drawPath() {
+        var path = svg.selectAll('path').data([points]);
+        path.enter()
+          .append('path');
+        path.attr('d', line)
           .attr('class', 'line')
-          .exit().remove()
+          .exit()
+          .remove();
       }
 
-      // drawPath(points)
+      function drawPathInit() {
+        path = svg.selectAll('path').data([points]);
+        path.enter()
+          .append('path')
+          .attr('d', line)
+          .attr('class', 'line')
+          .exit()
+          .remove();
+      }
+
+      drawPathInit();
 
       var drag = d3.drag().on("drag", dragHandler);
       svg.call(drag);
@@ -168,18 +178,20 @@
           var circle = d3.select(circles._groups[0][i]);
           circle.attr('cy', y);
           points[i].y = y;
-          drawPath(points);
+          drawPath();
       }
 
-      window.setInterval(function() {
-        var i = Math.floor(Math.random() * numPoints),
-            circle = d3.select(circles._groups[0][i]),
-            y = Math.floor(Math.random() * 30) + points[i].y
+      function cascade() {
+        window.setInterval(function() {
+          var i = Math.floor(Math.random() * numPoints),
+              circle = d3.select(circles._groups[0][i]),
+              y = Math.floor(Math.random() * 30) + points[i].y;
 
-          circle.attr('cy', y);
-          points[i].y = y;
-          drawPath(points);
-      }, 100)
+            circle.attr('cy', y);
+            points[i].y = y;
+            drawPath();
+        }, 100)
+      }
     </script>
   </body>
 </html>
