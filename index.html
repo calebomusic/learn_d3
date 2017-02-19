@@ -33,20 +33,26 @@
       var x = d3.scaleLinear().domain([0, data.length]).range([0, width]),
           y = d3.scaleLinear().domain([0, d3.max(data, function(datum) { return datum.books; })])
             .rangeRound([0, height]);
+
+      var spreadDomain = d3.scaleOrdinal()
+        .domain(d3.range(data.length));
+      var spreadRange = d3.scaleBand().rangeRound([0, width]);
+
       var barDemo = d3.select("#barDemo").
             append("svg:svg").
             attr("width", width).
             attr("height", height);
 
-      barDemo.selectAll("rect").
-        data(data).
-        enter().
-        append("svg:rect").
-        attr("x", function(datum, index) { return x(index)}).
-        attr("y", function(datum, index) { return height - y(datum.books)}).
-        attr("height", function(datum, index) { return y(datum.books) }).
-        attr("width", barWidth).
-        attr("fill", "#2d578b");
+      var bars = barDemo
+          .selectAll("rect")
+          .data(data)
+          .enter()
+            .append("svg:rect")
+            .attr("x", function(datum, index) { return x(index)})
+            .attr("y", function(datum, index) { return height - y(datum.books)})
+            .attr("height", function(datum, index) { return y(datum.books) })
+            .attr("width", barWidth)
+            .attr("fill", "#2d578b");
 
       barDemo.selectAll("text").
         data(data).
@@ -60,7 +66,7 @@
         text(function(datum) { return datum.books;}).
         attr("fill", "white");
 
-        barDemo.selectAll("text.yAxis").
+        barDemo.selectAll("text").
           data(data).
           enter().
           append("svg:text").
@@ -72,6 +78,21 @@
           text(function(datum) { return datum.year;}).
           attr("transform", "translate(0, 18)").
           attr("class", "yAxis");
+
+        var drag = d3.drag().on("drag", dragHandler);
+        barDemo.call(drag);
+
+        function dragHandler() {
+          var coord = d3.mouse(this),
+              x = coord[0],
+              y = coord[1];
+              
+          var i = Math.floor(x / 50);
+
+          if(i >= bars._groups[0].length) return;
+
+          d3.select(bars._groups[0][i]).attr('y', y);
+        }
     </script>
   </body>
 </html>
