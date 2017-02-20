@@ -169,7 +169,7 @@
       }
 
       function drawPathInit() {
-        path = svg.selectAll('path').data([points]);
+        var path = svg.selectAll('path').data([points]);
         path.enter()
           .append('path')
           .attr('d', line)
